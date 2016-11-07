@@ -10,7 +10,7 @@ class SparkWebhook extends Adapter
     self = @
     @getMe (err,me) ->
       if (err)
-        self.log "Error: "+JSON.stringify(err)
+        self.logError "Error: "+JSON.stringify(err)
       else
         self.me = me
 
@@ -26,11 +26,15 @@ class SparkWebhook extends Adapter
       if @isImageDocURL(str)
         messageParams = {}  
         messageParams.file = str
-        sparkclient.createMessage room null messageParams
+        sparkclient.createMessage room null messageParams, (err, response) ->
+          if err
+            self.logError "Error: "+JSON.stringify(err)
       else
         messageParams = {}  
         messageParams.markdown = true
-        sparkclient.createMessage room str messageParams
+        sparkclient.createMessage room str messageParams, (err, response) ->
+          if err
+            self.logError "Error: "+JSON.stringify(err)
 
   reply: (envelope, strings...) ->
     @log "Sending reply"
@@ -52,7 +56,7 @@ class SparkWebhook extends Adapter
       if IncomingMessage.resource == 'messages' && IncomingMessage.event == 'created' && IncomingMessage.data.personId != self.me.id
           sparkclient.getMessage IncomingMessage.data.id, (err, messageDetail) ->
             if err
-              console.log errmsg + ': ' + err
+              self.logError "Error: "+JSON.stringify(err)
             else
               text = null
               if (messageDetail.mentionedPeople) #bot accounts have to be mentioned in cisco spark
