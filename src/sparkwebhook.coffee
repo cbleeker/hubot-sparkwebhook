@@ -26,7 +26,8 @@ class SparkWebhook extends Adapter
       if @isImageDocURL(str)
         messageParams = {}  
         messageParams.file = str
-        sparkclient.createMessage room null messageParams, (err, response) ->
+        message = null
+        sparkclient.createMessage room message messageParams, (err, response) ->
           if err
             self.logError "Error: "+JSON.stringify(err)
       else
