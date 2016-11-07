@@ -1,6 +1,6 @@
 {Robot, Adapter, TextMessage} = require 'hubot'
 https = require 'http'
-sparkclient = require 'ciscospark'
+sparkclient = require 'node-sparkclient'
 request = require 'request'
 class SparkWebhook extends Adapter
   constructor: (robot) ->
@@ -23,9 +23,13 @@ class SparkWebhook extends Adapter
     room = envelope.room
     strings.forEach (str) =>
       if @isImageDocURL(str)
-        sparkclient.messages.create({files:[str],roomId: room})
+        messageParams = {}  
+        messageParams.file = str
+        sparkclient.createMessage(room, null, messageParams)
       else
-        sparkclient.messages.create({text: str, roomId: room})
+        messageParams = {}  
+        messageParams.markdown = true
+        sparkclient.createMessage(room, str, messageParams)
 
   reply: (envelope, strings...) ->
     @log "Sending reply"
@@ -45,7 +49,7 @@ class SparkWebhook extends Adapter
       IncomingMessage = req.body
       # Make sure it is a message created event and make sure it's not from the bot.
       if IncomingMessage.resource == 'messages' && IncomingMessage.event == 'created' && IncomingMessage.data.personId != self.me.id
-          sparkclient.messages.get(IncomingMessage.data.id)
+          sparkclient.getMessage(IncomingMessage.data.id)
           .then (messageDetail) ->
             text = null
             if (messageDetail.mentionedPeople) #bot accounts have to be mentioned in cisco spark
