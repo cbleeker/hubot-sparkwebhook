@@ -1,6 +1,7 @@
 {Robot, Adapter, TextMessage} = require 'hubot'
 https = require 'http'
-sparkclient = require 'node-sparkclient'
+CiscoSparkClient = require('node-ciscospark')
+sparkclient = new CiscoSparkClient(CISCOSPARK_ACCESS_TOKEN)
 request = require 'request'
 class SparkWebhook extends Adapter
   constructor: (robot) ->
