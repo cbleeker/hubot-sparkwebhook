@@ -26,11 +26,11 @@ class SparkWebhook extends Adapter
       if @isImageDocURL(str)
         messageParams = {}  
         messageParams.file = str
-        sparkclient.createMessage(room, null, messageParams)
+        sparkclient.createMessage room null messageParams
       else
         messageParams = {}  
         messageParams.markdown = true
-        sparkclient.createMessage(room, str, messageParams)
+        sparkclient.createMessage room str messageParams
 
   reply: (envelope, strings...) ->
     @log "Sending reply"
@@ -50,18 +50,20 @@ class SparkWebhook extends Adapter
       IncomingMessage = req.body
       # Make sure it is a message created event and make sure it's not from the bot.
       if IncomingMessage.resource == 'messages' && IncomingMessage.event == 'created' && IncomingMessage.data.personId != self.me.id
-          sparkclient.getMessage(IncomingMessage.data.id)
-          .then (messageDetail) ->
-            text = null
-            if (messageDetail.mentionedPeople) #bot accounts have to be mentioned in cisco spark
-              text = self.robot.name+" "+self.stripMention(messageDetail.html)
-            else # must be a 1:1 room
-              text = self.robot.name+" "+messageDetail.text
-            author =  {}
-            author.room = messageDetail.roomId
-            author.name =  messageDetail.personEmail
-            if text and author
-              self.receive new TextMessage(author, text)
+          sparkclient.getMessage IncomingMessage.data.id, (err, messageDetail) ->
+            if err
+              console.log errmsg + ': ' + err
+            else
+              text = null
+              if (messageDetail.mentionedPeople) #bot accounts have to be mentioned in cisco spark
+                text = self.robot.name+" "+self.stripMention(messageDetail.html)
+              else # must be a 1:1 room
+                text = self.robot.name+" "+messageDetail.text
+              author =  {}
+              author.room = messageDetail.roomId
+              author.name =  messageDetail.personEmail
+              if text and author
+                self.receive new TextMessage(author, text)
 
       # send back an empty reply to the incoming webhook.
       res.end ""
