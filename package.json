@@ -1,6 +1,6 @@
 {
   "name": "hubot-sparkwebhook",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Marcello Federico"
   },
@@ -27,6 +27,6 @@
   },
   "homepage": "https://github.com/marchfederico/hubot-sparkwebhook",
   "dependencies": {
-    "ciscospark": "^0.6.8"
+    "node-sparkclient": "^0.1.0"
   }
 }
