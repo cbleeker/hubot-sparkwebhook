@@ -21,19 +21,19 @@ class SparkWebhook extends Adapter
   # Communicating back to the Cisco Spark room.
   ###################################################################
   send: (envelope, strings...) ->
-    room = envelope.room
+    roomId = envelope.room
     strings.forEach (str) =>
       if @isImageDocURL(str)
         messageParams = {}  
         messageParams.file = str
         message = null
-        sparkclient.createMessage room message messageParams, (err, response) ->
+        sparkclient.createMessage roomId message messageParams, (err, response) ->
           if err
             self.logError "Error: "+JSON.stringify(err)
       else
         messageParams = {}  
         messageParams.markdown = true
-        sparkclient.createMessage room str messageParams, (err, response) ->
+        sparkclient.createMessage roomId str messageParams, (err, response) ->
           if err
             self.logError "Error: "+JSON.stringify(err)
 
